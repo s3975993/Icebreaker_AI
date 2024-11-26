@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
+load_dotenv()
+from langchain_community.chat_models import ChatOllama
 from langchain.prompts.prompt import PromptTemplate
 from langchain_core.tools import Tool
 from langchain.agents import (
@@ -8,22 +9,26 @@ from langchain.agents import (
     AgentExecutor,
 )
 from langchain import hub
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-
+from Tools.tools import get_profile_url_tavily
 
 def lookup(name:str)->str:
-   llm=ChatOpenAI(temperature=0,model_name="gpt-40-mini",)
    
-   template="""Given the full name {name_of_the_person} of the person. I want you to give me the link to their linkedin profile
+   llm=ChatOllama(model="llama3.2")
+   
+   template="""Given the full name {name_of_person} of the person. I want you to give me the link to their linkedin profile
     Your answer should only be a URL.
    """
    
-   prompt_template=PromptTemplate(template=template,input_varaiables=["name_of_the_person"])
+   prompt_template=PromptTemplate(template=template,input_variables=["name_of_the_person"])
    
    tools_for_agent = [
        Tool(
-           name="Crawl google for linkedin page"
-           func="?"
+           name="Crawl google for linkedin page",
+           func=get_profile_url_tavily,
            description="Useful when you need to get the Linkedin Page URL",
        )
    ]
